@@ -19,3 +19,6 @@
 *.exe
 *.out
 *.app
+# Hidden Files / Eclipse Workspace files
+.cproject
+.project
