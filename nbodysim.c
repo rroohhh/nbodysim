@@ -50,6 +50,7 @@ body *univers = NULL;
 void sum_grav(int body) {
 	int i;
 	double tmp;
+	double mgrav;
 
 	for (i = body + 1; i < size; i++) {
 		double dx = (univers[i].r.now.x - univers[body].r.now.x);
@@ -57,23 +58,21 @@ void sum_grav(int body) {
 		double dz = (univers[i].r.now.z - univers[body].r.now.z);
 		double dist = sqrt(dx * dx + dy * dy + dz * dz);
 		double diff = dist * dist * dist;
+		mgrav = gc * univers[i].mass * univers[body].mass;
 
-		tmp = univers[i].mass * (dx / diff);
+		tmp = mgrav * (dx / diff);
 		univers[body].f.now.x += tmp;
 		univers[i].f.now.x += -1 * tmp;
-		tmp = univers[i].mass * (dy / diff);
+		tmp = mgrav * (dy / diff);
 		univers[body].f.now.y += tmp;
 		univers[i].f.now.y += -1 * tmp;
-		tmp = univers[i].mass * (dz / diff);
+		tmp = mgrav * (dz / diff);
 		univers[body].f.now.z += tmp;
 		univers[i].f.now.z += -1 * tmp;
 	}
 
-	univers[body].f.now.x *= gc * univers[body].mass;
 	printf("%lf", univers[body].f.now.x);
-	univers[body].f.now.y *= gc * univers[body].mass;
 	printf("%lf", univers[body].f.now.y);
-	univers[body].f.now.z *= gc * univers[body].mass;
 	printf("%lf", univers[body].f.now.z);
 }
 
