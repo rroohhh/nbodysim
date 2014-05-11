@@ -1,0 +1,1 @@
+nbodysim.d: ../nbodysim.c

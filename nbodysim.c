@@ -6,16 +6,17 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 //Global Vars
 double t;
-double y = 6.67384 * 10^(-11);
+double y = 6.67384 * 10e-11;
 int size;
 double time;
 double endtime;
 char output[100];
-const FILE *file = fopen(output, "a+");
+FILE *file;
 
 //Typedefs:
 
@@ -49,9 +50,13 @@ void sum_grav(int body) {
 	double tmp;
 
 	for (i = body; i < size; i++) {
-		double diff = sqrt((univers[i].r.now.x - univers[body].r.now.x)^2 + (univers[i].r.now.y - univers[body].r.now.y)^2 + (univers[i].r.now.z - univers[body].r.now.z) ^2)^3;
+	        double dx = (univers[i].r.now.x - univers[body].r.now.x);
+		double dy = (univers[i].r.now.y - univers[body].r.now.y);
+		double dz = (univers[i].r.now.z - univers[body].r.now.z);
+		double dist = sqrt(dx*dx + dy*dy + dz*dz);
+		double diff = dist*dist*dist;
 
-		double tmp = (univers[i].r.now.x - univers[body].r.now.x) / diff;
+		tmp = (univers[i].r.now.x - univers[body].r.now.x) / diff;
 		univers[body].f.now.x += tmp;
 		univers[i].f.now.x += -1 * tmp;
 		tmp = (univers[i].r.now.y - univers[body].r.now.y) / diff;
@@ -115,11 +120,11 @@ void setup_univers() {
 
 	for (i = 0; i < size; i++) {
 		univers[i].r.new.x = univers[i].r.now.x + univers[i].v.x * t
-				+ 0.5 * univers[i].a.now.x * (t ^ 2);
+				+ 0.5 * univers[i].a.now.x * t*t ;
 		univers[i].r.new.y = univers[i].r.now.y + univers[i].v.y * t
-				+ 0.5 * univers[i].a.now.y * (t ^ 2);
+				+ 0.5 * univers[i].a.now.y * t*t;
 		univers[i].r.new.z = univers[i].r.now.z + univers[i].v.z * t
-				+ 0.5 * univers[i].a.now.z * (t ^ 2);
+				+ 0.5 * univers[i].a.now.z * t*t;
 		univers[i].a.now.x = univers[i].a.old.x;
 		univers[i].a.now.y = univers[i].a.old.y;
 		univers[i].a.now.z = univers[i].a.old.z;
@@ -133,9 +138,9 @@ void calc_next() {
 	int i;
 
 	setup_next();
-int i;
+
 	for (i = 0; i < size; i++) {
-		sum_grav(body);
+		sum_grav(i);
 	}
 
 	a();
@@ -151,35 +156,36 @@ void user_prompt() {
 
 	printf("Stepsize? ");
 	scanf("%lf", &t);
-	printf("\n Size of Univers?");
+	printf("Size of Univers? ");
 	scanf("%d", &size);
 	univers = malloc(size * sizeof(body));
 
 	for (i = 0; i < size; i++) {
-		printf("\n%i. Körper:\n", (i - 1));
-		printf("v ");
-		scanf("%lf %lf %lf", &univers[i].v.x, &univers[i].v.y, &univers[i].v.z);
-		printf("\n");
-		printf("r ");
-		scanf("%lf %lf %lf", &univers[i].r.now.x, &univers[i].r.now.y,
+		printf("\n%i. Körper:\n", (i + 1));
+		printf("v \n");
+		scanf("%lf\n %lf\n %lf", &univers[i].v.x, &univers[i].v.y, &univers[i].v.z);
+		printf("r \n");
+		scanf("%lf\n %lf\n %lf", &univers[i].r.now.x, &univers[i].r.now.y,
 				&univers[i].r.now.z);
 		printf("\n");
 		printf("mass ");
 		scanf("%lf", &univers[i].mass);
 	}
-	printf("\nTime of Simulation?");
+	printf("\nLength of Simulation? ");
 	scanf("%lf", &endtime);
-	printf("\nOutput Filename?");
-	fgets(output, 100, stdin);
+	printf("\nOutput Filename? ");
+	scanf("%s", &output);
+	file = fopen(output, "a+");
 }
 
 void main() {
-	double i;
+	double ti;
+	int i;
 
 	user_prompt();
 
 	setup_univers();
-	for (i = 0; i <= t; i = i + t) {
+	for (ti = 0; ti <= endtime; ti += t) {
 		calc_next();
 		fprintf(file, "{");
 		for (i = 0; i < size; i++) {
@@ -193,7 +199,7 @@ void main() {
 			fprintf(file, "},");
 		}
 		fprintf(file, "}");
-		if( i == (size-1)) {
+		if( ti == (size-1)) {
 		fprintf(file, ",");
 		}
 	}
