@@ -1,6 +1,8 @@
 /*
  * nbodysim.c
  *
+ * An fast n-body simulation 
+ *
  *  Created on: 09.05.2014
  *      Author: robin
  */
