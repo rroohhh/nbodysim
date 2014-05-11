@@ -70,10 +70,6 @@ void sum_grav(int body) {
 		univers[body].f.now.z += tmp;
 		univers[i].f.now.z += -1 * tmp;
 	}
-
-	printf("%lf", univers[body].f.now.x);
-	printf("%lf", univers[body].f.now.y);
-	printf("%lf", univers[body].f.now.z);
 }
 
 void leap(int body) {
