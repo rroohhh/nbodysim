@@ -175,6 +175,7 @@ void user_prompt() {
 void printpos(double x, double y, double z) {
 	fprintf(file, "{%lf,%lf,%lf}", x, y, z);
 }
+
 void printstep() {
 	int i;
 	fprintf(file, "{");
@@ -185,6 +186,7 @@ void printstep() {
 	}
 	fprintf(file, "}");
 }
+
 int main() {
 	double time;
 
