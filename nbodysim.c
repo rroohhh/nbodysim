@@ -13,7 +13,7 @@
 
 //Global Vars
 double t;
-double gc = 6.67384 * 10e-11;
+double gc = 6.67384e-11;
 int size;
 double time;
 double endtime;
@@ -58,8 +58,10 @@ void sum_grav(int body) {
 		double dz = (univers[i].r.now.z - univers[body].r.now.z);
 		double dist = sqrt(dx * dx + dy * dy + dz * dz);
 		double diff = dist * dist * dist;
+		printf("dist(%i)(x)(y)(z)=%15.10lf,%15.10lf,%15.10lf,gesamtdist: %15.10lf,diff(dist^3): %15.10lf\n", i, dx, dy, dz, dist, diff);
 		mgrav = gc * univers[i].mass * univers[body].mass;
-
+		printf("mgrav: %15.10lf", mgrav);
+		printf("Masse: %15.10lf, %15.10lf\n", univers[body].mass, univers[i].mass);
 		tmp = mgrav * (dx / diff);
 		univers[body].f.now.x += tmp;
 		univers[i].f.now.x += -1 * tmp;
@@ -70,6 +72,8 @@ void sum_grav(int body) {
 		univers[body].f.now.z += tmp;
 		univers[i].f.now.z += -1 * tmp;
 	}
+	printf("%i. Körper %15.10lf,%15.10lf,%15.10lf\n", body, univers[body].f.now.x,
+			univers[body].f.now.y, univers[body].f.now.z);
 }
 
 void leap(int body) {
@@ -111,11 +115,11 @@ void setup_univers() {
 
 	for (i = 0; i < size; i++) {
 		univers[i].r.new.x = univers[i].r.now.x + univers[i].v.x * t
-				+ 0.5 * univers[i].a.now.x * t * t;
+				+ 0.5 * (univers[i].f.now.x / univers[i].mass) * t * t;
 		univers[i].r.new.y = univers[i].r.now.y + univers[i].v.y * t
-				+ 0.5 * univers[i].a.now.y * t * t;
+				+ 0.5 * (univers[i].f.now.y / univers[i].mass) * t * t;
 		univers[i].r.new.z = univers[i].r.now.z + univers[i].v.z * t
-				+ 0.5 * univers[i].a.now.z * t * t;
+				+ 0.5 * (univers[i].f.now.z / univers[i].mass) * t * t;
 		univers[i].r.old.x = univers[i].r.now.x;
 		univers[i].r.old.y = univers[i].r.now.y;
 		univers[i].r.old.z = univers[i].r.now.z;
@@ -156,7 +160,6 @@ void user_prompt() {
 		printf("r \n");
 		scanf("%lf\n %lf\n %lf", &univers[i].r.now.x, &univers[i].r.now.y,
 				&univers[i].r.now.z);
-		printf("\n");
 		printf("mass ");
 		scanf("%lf", &univers[i].mass);
 	}
@@ -192,7 +195,7 @@ int main() {
 	printstep();
 	for (time = 0; time <= endtime; time += t) {
 		calc_next();
-		fprintf(file, ",");
+		fprintf(file, ",\n");
 		printstep();
 	}
 	fprintf(file, "}");
