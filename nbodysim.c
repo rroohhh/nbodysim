@@ -35,7 +35,6 @@ typedef struct {
 typedef struct {
 	vector old;
 	vector now;
-	vector new;
 } matrix;
 
 //body
@@ -59,14 +58,18 @@ void sum_grav(int body) {
 		double dz = (univers[i].r.now.z - univers[body].r.now.z);
 		double dist = sqrt(dx * dx + dy * dy + dz * dz);
 		double diff = dist * dist * dist;
+
 		/*
-		 printf(
-		 "dist(%i)(x)(y)(z)=%15.10lf,%15.10lf,%15.10lf,gesamtdist: %15.10lf,diff(dist^3): %15.10lf\n",
-		 i, dx, dy, dz, dist, diff);
+		 * printf(
+		 * "dist(%i)(x)(y)(z)=%15.10lf,%15.10lf,%15.10lf,gesamtdist: %15.10lf,diff(dist^3): %15.10lf\n",
+		 * i, dx, dy, dz, dist, diff);
 		 */
+
 		mgrav = gc * univers[i].mass * univers[body].mass;
+
 		//printf("mgrav: %15.10lf", mgrav);
 		//printf("Masse: %15.10lf, %15.10lf\n", univers[body].mass,	univers[i].mass);
+
 		tmp = mgrav * (dx / diff);
 		univers[body].f.x += tmp;
 		univers[i].f.x += -1 * tmp;
@@ -77,32 +80,31 @@ void sum_grav(int body) {
 		univers[body].f.z += tmp;
 		univers[i].f.z += -1 * tmp;
 	}
+
 	//printf("%i. Körper %15.10lf,%15.10lf,%15.10lf\n", body, univers[body].f.x,
 	//		univers[body].f.y, univers[body].f.z);
 }
 
 void leap(int body) {
+
 	/*
-	 printf("pos_old(%i)(x)(y)(z)=%15.10lf,%15.10lf,%15.10lf\n", body,
-	 univers[body].r.old.x, univers[body].r.old.y,
-	 univers[body].r.old.z);
-	 printf("pos_now(%i)(x)(y)(z)=%15.10lf,%15.10lf,%15.10lf\n", body,
-	 univers[body].r.now.x, univers[body].r.now.y,
-	 univers[body].r.now.z);
+	 * printf("pos_old(%i)(x)(y)(z)=%15.10lf,%15.10lf,%15.10lf\n", body,
+	 * univers[body].r.old.x, univers[body].r.old.y,
+	 * univers[body].r.old.z);
+	 * printf("pos_now(%i)(x)(y)(z)=%15.10lf,%15.10lf,%15.10lf\n", body,
+	 * univers[body].r.now.x, univers[body].r.now.y,
+	 * univers[body].r.now.z);
 	 */
-	univers[body].r.new.x = 2 * univers[body].r.now.x - univers[body].r.old.x
-			+ (univers[body].f.x / univers[body].mass) * t * t;
-	univers[body].r.new.y = 2 * univers[body].r.now.y - univers[body].r.old.y
-			+ (univers[body].f.y / univers[body].mass) * t * t;
-	univers[body].r.new.z = 2 * univers[body].r.now.z - univers[body].r.old.z
-			+ (univers[body].f.z / univers[body].mass) * t * t;
 
 	univers[body].r.old.x = univers[body].r.now.x;
 	univers[body].r.old.y = univers[body].r.now.y;
 	univers[body].r.old.z = univers[body].r.now.z;
-	univers[body].r.now.x = univers[body].r.new.x;
-	univers[body].r.now.y = univers[body].r.new.y;
-	univers[body].r.now.z = univers[body].r.new.z;
+	univers[body].r.now.x = 2 * univers[body].r.now.x - univers[body].r.old.x
+			+ (univers[body].f.x / univers[body].mass) * t * t;
+	univers[body].r.now.y = 2 * univers[body].r.now.y - univers[body].r.old.y
+			+ (univers[body].f.y / univers[body].mass) * t * t;
+	univers[body].r.now.z = 2 * univers[body].r.now.z - univers[body].r.old.z
+			+ (univers[body].f.z / univers[body].mass) * t * t;
 
 }
 
@@ -129,18 +131,15 @@ void setup_univers() {
 	}
 
 	for (i = 0; i < size; i++) {
-		univers[i].r.new.x = univers[i].r.now.x + univers[i].v.x * t
-				+ 0.5 * (univers[i].f.x / univers[i].mass) * t * t;
-		univers[i].r.new.y = univers[i].r.now.y + univers[i].v.y * t
-				+ 0.5 * (univers[i].f.y / univers[i].mass) * t * t;
-		univers[i].r.new.z = univers[i].r.now.z + univers[i].v.z * t
-				+ 0.5 * (univers[i].f.z / univers[i].mass) * t * t;
 		univers[i].r.old.x = univers[i].r.now.x;
 		univers[i].r.old.y = univers[i].r.now.y;
 		univers[i].r.old.z = univers[i].r.now.z;
-		univers[i].r.now.x = univers[i].r.new.x;
-		univers[i].r.now.y = univers[i].r.new.y;
-		univers[i].r.now.z = univers[i].r.new.z;
+		univers[i].r.now.x = univers[i].r.now.x + univers[i].v.x * t
+				+ 0.5 * (univers[i].f.x / univers[i].mass) * t * t;
+		univers[i].r.now.y = univers[i].r.now.y + univers[i].v.y * t
+				+ 0.5 * (univers[i].f.y / univers[i].mass) * t * t;
+		univers[i].r.now.z = univers[i].r.now.z + univers[i].v.z * t
+				+ 0.5 * (univers[i].f.z / univers[i].mass) * t * t;
 	}
 }
 
@@ -182,7 +181,8 @@ void user_prompt() {
 	scanf("%lf", &endtime);
 	printf("\nOutput Filename? ");
 	scanf("%s", output);
-//file = fopen(output, "w+");
+
+	//file = fopen(output, "w+");
 }
 
 FILE *init_output(char *output) {
